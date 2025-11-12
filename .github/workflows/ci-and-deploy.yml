@@ -6,12 +6,18 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write    # allow gh-pages action to push
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout code (full history)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # full history so gh-pages can create/update branches
 
       - name: Use Node.js 18
         uses: actions/setup-node@v4
@@ -36,15 +42,23 @@ jobs:
     if: success()
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout code (needed for deploy)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true   # ensure the action has credentials to push
+
+      - name: Setup git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Ensure dependencies (for any build)
+      - name: Install dependencies (for any build)
         run: |
           if [ -f package-lock.json ]; then
             npm ci
@@ -52,8 +66,19 @@ jobs:
             npm install
           fi
 
-      - name: Deploy repository root to GitHub Pages
+      - name: (Optional) Build project
+        run: |
+          # If you have a build step (e.g. bundler), run it here.
+          # For this simple static site, this can be skipped or left as-is.
+          npm run build --if-present
+
+      - name: Deploy repository root to GitHub Pages (gh-pages branch)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
+          publish_branch: gh-pages
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          allow_empty_commit: true
+          commit_message: "chore(pages): deploy via GitHub Actions"
