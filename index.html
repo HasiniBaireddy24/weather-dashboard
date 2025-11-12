@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Weather Dashboard</h1>
+
+    <!-- Search (Version 2) -->
+    <section id="search-section">
+      <form id="city-form">
+        <input id="city-input" type="text" placeholder="Enter city (e.g., London)" required />
+        <button type="submit">Search</button>
+      </form>
+    </section>
+
+    <!-- Current weather (Version 1 and 2) -->
+    <section id="current-weather" aria-live="polite">
+      <h2 id="city-name">City</h2>
+      <p id="current-desc">Weather description</p>
+      <p>
+        <span id="temp">--</span>
+        <button id="toggle-unit" aria-pressed="false">°C</button>
+      </p>
+    </section>
+
+    <!-- 5-day forecast (Version 2) -->
+    <section id="forecast-section">
+      <h3>5-Day Forecast</h3>
+      <div id="forecast-cards" class="cards"></div>
+    </section>
+  </main>
+
+  <script src="script.js" type="module"></script>
+</body>
+</html>
